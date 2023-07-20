@@ -1,4 +1,4 @@
-package com.example.weatherapp
+package com.example.weatherapp.activities
 
 import android.Manifest
 import android.content.ActivityNotFoundException
@@ -16,6 +16,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.example.weatherapp.Constants
+import com.example.weatherapp.R
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationRequest.Builder.IMPLICIT_MIN_UPDATE_INTERVAL
 import com.karumi.dexter.Dexter
