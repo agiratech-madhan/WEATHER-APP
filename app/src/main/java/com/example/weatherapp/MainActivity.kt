@@ -41,15 +41,3 @@ class MainActivity : AppCompatActivity() {
         ))
     }
 }
-/**
- *
- *  private fun isLocationEnabled(): Boolean {
-
-// This provides access to the system location services.
-val locationManager: LocationManager =
-getSystemService(Context.LOCATION_SERVICE) as LocationManager
-return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-LocationManager.NETWORK_PROVIDER
-)
-}
- */
