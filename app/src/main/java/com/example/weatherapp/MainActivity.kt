@@ -1,10 +1,10 @@
 package com.example.weatherapp
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
@@ -15,6 +15,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationRequest.Builder.IMPLICIT_MIN_UPDATE_INTERVAL
 import com.karumi.dexter.Dexter
@@ -104,7 +105,6 @@ class MainActivity : AppCompatActivity() {
             }.show()
     }
 
-    @SuppressLint("MissingPermission")
     private fun requestLocationData() {
 
         val mLocationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
@@ -114,6 +114,23 @@ class MainActivity : AppCompatActivity() {
                 setMaxUpdateDelayMillis(100000)
             }.build()
 
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
         mFusedLocationClient.requestLocationUpdates(
             mLocationRequest, mLocationCallback,
             Looper.myLooper()
@@ -131,7 +148,29 @@ class MainActivity : AppCompatActivity() {
 
             val longitude = mLastLocation.longitude
             Log.i("Current Longitude", "$longitude")
+            getLocationWeatherDetails()
+
         }
+    }
+
+    private fun getLocationWeatherDetails() {
+
+        // START
+        if (Constants.isNetworkAvailable(this@MainActivity)) {
+
+            Toast.makeText(
+                this@MainActivity,
+                "You have connected to the internet. Now you can make an api call.",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            Toast.makeText(
+                this@MainActivity,
+                "No internet connection available.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        // END
     }
 
     private fun isLocationEnabled(): Boolean {
