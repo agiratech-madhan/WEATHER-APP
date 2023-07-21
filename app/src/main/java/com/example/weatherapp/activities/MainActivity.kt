@@ -13,6 +13,8 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -39,6 +41,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var mProgressDialog: Dialog? = null
 
+    // A global variable for Current Latitude
+    private var mLatitude: Double = 0.0
+
+    // A global variable for Current Longitude
+    private var mLongitude: Double = 0.0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -113,11 +120,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestLocationData() {
 
-        val mLocationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+        val mLocationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 100000)
             .apply {
                 setWaitForAccurateLocation(false)
                 setMinUpdateIntervalMillis(IMPLICIT_MIN_UPDATE_INTERVAL)
-                setMaxUpdateDelayMillis(100000)
+//                setMaxUpdateDelayMillis(100000)
             }.build()
 
 
@@ -134,16 +141,15 @@ class MainActivity : AppCompatActivity() {
         override fun onLocationResult(locationResult: LocationResult) {
             val mLastLocation: Location = locationResult.lastLocation!!
             val latitude = mLastLocation.latitude
-            Log.i("Current Latitude", "$latitude")
-
-            val longitude = mLastLocation.longitude
-            Log.i("Current Longitude", "$longitude")
-            getLocationWeatherDetails(latitude, longitude)
+            mLatitude = mLastLocation.latitude
+            Log.e("Current Latitude", "$mLatitude")
+            mLongitude = mLastLocation.longitude
+            getLocationWeatherDetails()
 
         }
     }
 
-    private fun getLocationWeatherDetails(latitude: Double, longitude: Double) {
+    private fun getLocationWeatherDetails() {
 
         // START
         if (Constants.isNetworkAvailable(this@MainActivity)) {
@@ -158,7 +164,7 @@ class MainActivity : AppCompatActivity() {
              * Here we pass the required param in the service
              */
             val listCall: Call<WeatherResponse> = service.getWeather(
-                latitude, longitude, Constants.METRIC_UNIT, Constants.APP_ID
+                mLatitude, mLongitude, Constants.METRIC_UNIT, Constants.APP_ID
             )
             showCustomProgressDialog()
             listCall.enqueue(object : Callback<WeatherResponse> {
@@ -293,5 +299,24 @@ class MainActivity : AppCompatActivity() {
             SimpleDateFormat("HH:mm:ss")
         sdf.timeZone = TimeZone.getDefault()
         return sdf.format(date)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            // TODO (STEP 7: Now finally, make an api call on item selection.)
+            // START
+            R.id.action_refresh -> {
+                getLocationWeatherDetails()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+            // END
+        }
     }
 }
