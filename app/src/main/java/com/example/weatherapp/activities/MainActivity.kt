@@ -2,6 +2,7 @@ package com.example.weatherapp.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -31,6 +32,8 @@ import retrofit.*
 class MainActivity : AppCompatActivity() {
     // A fused location client variable which is further used to get the user's current location  from GMS
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private var mProgressDialog: Dialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -54,10 +57,8 @@ class MainActivity : AppCompatActivity() {
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                         if (report!!.areAllPermissionsGranted()) {
-
                             requestLocationData()
                         }
-
                         if (report.isAnyPermissionPermanentlyDenied) {
                             Toast.makeText(
                                 this@MainActivity,
@@ -153,6 +154,7 @@ class MainActivity : AppCompatActivity() {
             val listCall: Call<WeatherResponse> = service.getWeather(
                 latitude, longitude, Constants.METRIC_UNIT, Constants.APP_ID
             )
+            showCustomProgressDialog()
             listCall.enqueue(object : Callback<WeatherResponse> {
                 @SuppressLint("SetTextI18n")
                 override fun onResponse(
@@ -162,7 +164,7 @@ class MainActivity : AppCompatActivity() {
 
                     // Check weather the response is success or not.
                     if (response.isSuccess) {
-
+                        hideProgressDialog()
                         /** The de-serialized response body of a successful response. */
                         val weatherList: WeatherResponse = response.body()
                         Log.i("Response Result", "$weatherList")
@@ -185,6 +187,8 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onFailure(t: Throwable) {
                     Log.e("Errorrrrr", t.message.toString())
+                    hideProgressDialog()
+
                 }
             })
 
@@ -212,5 +216,22 @@ class MainActivity : AppCompatActivity() {
         return (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
         ))
+    }
+
+    private fun showCustomProgressDialog() {
+        mProgressDialog = Dialog(this)
+
+        /*Set the screen content from a layout resource.
+        The resource will be inflated, adding all top-level views to the screen.*/
+        mProgressDialog!!.setContentView(R.layout.custom_dialog)
+
+        //Start the dialog and display it on screen.
+        mProgressDialog!!.show()
+    }
+
+    private fun hideProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog!!.dismiss()
+        }
     }
 }
