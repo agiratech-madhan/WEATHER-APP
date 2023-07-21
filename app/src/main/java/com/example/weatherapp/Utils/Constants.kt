@@ -1,13 +1,17 @@
 package com.example.weatherapp.Utils
 
 
-
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 
 object Constants {
+
+
+    const val APP_ID: String = "f145bd82d860fb943a2a48c205b90827"
+    const val BASE_URL: String = "http://api.openweathermap.org/data/"
+    const val METRIC_UNIT: String = "metric"
 
     /**
      * This function is used check the weather the device is connected to the Internet or not.
@@ -16,6 +20,7 @@ object Constants {
         // It answers the queries about the state of network connectivity.
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        /// This  consdition for checking new and old android version
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val network = connectivityManager.activeNetwork ?: return false
             val activeNetWork = connectivityManager.getNetworkCapabilities(network) ?: return false
@@ -27,6 +32,7 @@ object Constants {
                 else -> false
             }
         } else {
+
             // Returns details about the currently active default data network.
             val networkInfo = connectivityManager.activeNetworkInfo
 //            val networkInfo = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
