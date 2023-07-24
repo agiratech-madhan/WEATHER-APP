@@ -148,10 +148,11 @@ class MainActivity : AppCompatActivity() {
     private val mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             val mLastLocation: Location = locationResult.lastLocation!!
-            val latitude = mLastLocation.latitude
             mLatitude = mLastLocation.latitude
             Log.e("Current Latitude", "$mLatitude")
             mLongitude = mLastLocation.longitude
+            Log.e("Current Longtitude", "$mLongitude")
+
             getLocationWeatherDetails()
 
         }
@@ -165,6 +166,8 @@ class MainActivity : AppCompatActivity() {
             val retrofit: Retrofit = Retrofit.Builder().baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
+            Log.e("Current BaseURL", "${retrofit.baseUrl()}")
+
             val service: WeatherService =
                 retrofit.create<WeatherService>(WeatherService::class.java)
 
@@ -174,6 +177,8 @@ class MainActivity : AppCompatActivity() {
             val listCall: Call<WeatherResponse> = service.getWeather(
                 mLatitude, mLongitude, Constants.METRIC_UNIT, Constants.APP_ID
             )
+            Log.e("API URL", "${listCall}")
+
             showCustomProgressDialog()
             listCall.enqueue(object : Callback<WeatherResponse> {
                 @SuppressLint("SetTextI18n")
@@ -181,6 +186,9 @@ class MainActivity : AppCompatActivity() {
                     response: Response<WeatherResponse>,
                     retrofit: Retrofit
                 ) {
+                    Log.e("Current Response", "${response.body()}")
+                    Log.e("Data Retrofit", "${response.body()}")
+                    Log.e("Data Response", "${response.isSuccess}")
 
                     // Check weather the response is success or not.
                     if (response.isSuccess) {
@@ -304,6 +312,8 @@ class MainActivity : AppCompatActivity() {
                     "13n" -> binding?.ivMain?.setImageResource(R.drawable.snowflake)
                 }
             }
+        }else{
+            Log.d("Data is Not Available", "Madhan")
         }
 
     }
